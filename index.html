@@ -17,7 +17,6 @@
             padding: 20px 0;
         }
 
-        /* Desain Header Container */
         .header-container {
             text-align: center;
             margin-bottom: 15px;
@@ -39,7 +38,6 @@
             margin-top: 5px;
         }
 
-        /* Desain Gambar Header */
         .header-image {
             width: 100%;
             max-width: 320px;
@@ -47,7 +45,6 @@
             margin-bottom: 20px;
         }
 
-        /* Desain Pengaturan / Settings */
         .settings-container {
             display: flex;
             flex-direction: row;
@@ -92,7 +89,6 @@
             background-color: #c2410c;
         }
 
-        /* Desain Papan Permainan */
         .game-board {
             width: 340px;
             padding: 10px;
@@ -102,7 +98,6 @@
             box-sizing: border-box;
         }
 
-        /* Kontainer Gelembung */
         .bubble-container {
             width: 80px;
             height: 80px;
@@ -111,7 +106,6 @@
             justify-self: center;
         }
 
-        /* Gelembung itu sendiri */
         .bubble {
             width: 100%;
             height: 100%;
@@ -126,6 +120,18 @@
             transform: rotateY(180deg);
             cursor: default;
             box-shadow: 0 6px 12px rgba(249, 115, 22, 0.2);
+        }
+
+        /* Efek khusus untuk ikan terakhir agar minta diklik */
+        .bubble.clickable-fish {
+            animation: pulse-fish 1s infinite alternate;
+            cursor: pointer !important;
+            z-index: 10;
+        }
+
+        @keyframes pulse-fish {
+            0% { transform: rotateY(180deg) scale(1); box-shadow: 0 0 10px rgba(249, 115, 22, 0.5); }
+            100% { transform: rotateY(180deg) scale(1.15); box-shadow: 0 0 25px rgba(249, 115, 22, 1); }
         }
 
         .bubble.error {
@@ -153,7 +159,7 @@
             border: 1px solid rgba(14, 165, 233, 0.3);
         }
 
-        .front::before {
+        .front::before, .back::before {
             content: '';
             position: absolute;
             top: 12%;
@@ -166,7 +172,7 @@
         }
 
         .front.small-text {
-            font-size: 18px; /* Disesuaikan agar tulisan "Mulai" muat di dalam gelembung */
+            font-size: 18px;
         }
 
         .back {
@@ -175,18 +181,6 @@
             box-shadow: inset -4px -4px 10px rgba(234, 88, 12, 0.3), inset 4px 4px 10px rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(234, 88, 12, 0.3);
             color: #9a3412;
-        }
-
-        .back::before {
-            content: '';
-            position: absolute;
-            top: 12%;
-            left: 18%;
-            width: 25%;
-            height: 25%;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            filter: blur(1px);
         }
 
         @keyframes shake {
@@ -214,6 +208,73 @@
             color: #ea580c;
             font-size: 26px;
         }
+
+        /* --- DESAIN LAYAR REWARD IKAN --- */
+        #reward-modal {
+            display: none; /* Disembunyikan secara default */
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .reward-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Efek cahaya berputar di belakang gambar */
+        .light-rays {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: repeating-conic-gradient(from 0deg, rgba(253, 224, 71, 0.9) 0deg 15deg, transparent 15deg 30deg);
+            border-radius: 50%;
+            animation: spin 6s linear infinite;
+            filter: blur(2px);
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Desain bulat untuk GIF Ikan */
+        .reward-image {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 6px solid #ffffff;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+            z-index: 2;
+        }
+
+        .close-btn {
+            margin-top: 40px;
+            padding: 12px 30px;
+            background: #ea580c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(234, 88, 12, 0.5);
+        }
+
+        .close-btn:hover {
+            background: #c2410c;
+        }
     </style>
 </head>
 <body>
@@ -236,13 +297,21 @@
             <option value="8">Perkalian 8</option>
             <option value="9">Perkalian 9</option>
         </select>
-        <button id="start-btn">Mulai</button>
+        <button id="start-btn">Mulai Ulang</button>
     </div>
 
     <div class="game-board" id="grid"></div>
 
     <div id="message-board">
-        Pilih perkalian lalu klik tombol <span style="color: #ea580c;">"Mulai"</span>
+        Pilih perkalian lalu klik tombol <span style="color: #ea580c;">"Mulai Ulang"</span>
+    </div>
+
+    <div id="reward-modal">
+        <div class="reward-container">
+            <div class="light-rays"></div>
+            <img src="https://raw.githubusercontent.com/dosen-uinsi/MANCING-PERKALIAN/refs/heads/main/Ikan.gif" alt="Ikan Reward" class="reward-image">
+        </div>
+        <button class="close-btn" onclick="closeModal()">Tutup</button>
     </div>
 
     <script>
@@ -250,7 +319,13 @@
         const messageBoard = document.getElementById('message-board');
         const multiplierSelect = document.getElementById('multiplier-select');
         const startBtn = document.getElementById('start-btn');
+        const rewardModal = document.getElementById('reward-modal');
         let currentExpected = "Mulai"; 
+
+        // Fungsi Menutup Modal Reward
+        function closeModal() {
+            rewardModal.style.display = 'none';
+        }
 
         // Fungsi untuk mengacak array (Fisher-Yates Shuffle)
         function shuffle(array) {
@@ -263,12 +338,12 @@
             return array;
         }
 
-        // Fungsi untuk membuat data game dinamis berdasarkan angka perkalian yang dipilih
+        // Fungsi untuk membuat data game
         function generateGameData(multiplier) {
             const sequence = [6, 8, 5, 3, 7, 4, 2, 9];
             let data = [];
             
-            // Gelembung pertama (Mulai)
+            // Gelembung pertama
             data.push({ 
                 front: "Mulai", 
                 back: `${multiplier}x${sequence[0]}`, 
@@ -288,7 +363,7 @@
                 });
             }
             
-            // Gelembung terakhir (Penyelesaian dengan emoji Ikan)
+            // Gelembung terakhir
             let lastRes = multiplier * sequence[sequence.length - 1];
             data.push({
                 front: lastRes.toString(),
@@ -305,9 +380,9 @@
             grid.innerHTML = '';
             currentExpected = "Mulai";
             messageBoard.innerHTML = `Klik gelembung <span style="color: #0284c7;">"Mulai"</span> untuk memancing!`;
+            rewardModal.style.display = 'none'; // Sembunyikan modal jika masih terbuka
 
             const selectedMultiplier = parseInt(multiplierSelect.value);
-            
             const gameData = generateGameData(selectedMultiplier);
             const shuffledTiles = shuffle([...gameData]);
 
@@ -335,14 +410,23 @@
                 grid.appendChild(container);
 
                 container.addEventListener('click', () => {
-                    if(bubble.classList.contains('flipped')) return;
+                    // Jika sudah dibalik dan merupakan ikan terakhir (yang punya efek klik)
+                    if(bubble.classList.contains('flipped')) {
+                        if(bubble.classList.contains('clickable-fish')) {
+                            // Tampilkan modal ikan
+                            rewardModal.style.display = 'flex';
+                        }
+                        return;
+                    }
 
                     if(bubble.dataset.requires === currentExpected) {
                         bubble.classList.add('flipped');
                         currentExpected = bubble.dataset.next; 
                         
                         if(currentExpected === "selesai") {
-                            messageBoard.innerHTML = "🎉 <span style='color: #ea580c;'>Selamat! Tangkapanmu luar biasa!</span> 🎉";
+                            // Tambahkan kelas untuk efek denyut pada ikan terakhir
+                            bubble.classList.add('clickable-fish');
+                            messageBoard.innerHTML = "<span style='color: #ea580c;'>Yey kamu dapat ikan!!!</span>";
                         } else {
                             messageBoard.innerHTML = `Berapa hasil dari <br> <span class="highlight">${data.back}</span> ?`;
                         }
@@ -358,6 +442,7 @@
 
         startBtn.addEventListener('click', startGame);
 
+        // Render otomatis saat pertama kali dibuka
         startGame();
     </script>
 </body>
